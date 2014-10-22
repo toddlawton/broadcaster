@@ -1,0 +1,59 @@
+/* General*/
+/* All items which are done can be greyed out for better visibility of remaining tasks */
+.ghx-done {
+  opacity: 0.3;
+  -webkit-transition: 1.5s ease all; }
+  .ghx-done:hover {
+    opacity: 0.8; }
+
+/* Make sure story points done badge doesn't become greyed out */
+.aui-badge .ghx-done {
+  opacity: 1; }
+
+/* Colors */
+/* Page or Section Specific */
+/* Move filters into the header */
+#ghx-operations {
+  display: inline-block;
+  position: fixed;
+  top: 51px;
+  left: 50%;
+  -webkit-transform: translateX(-50%); }
+
+/* Hide header collapse button, it is made somewhat redundant by other spacing improvements */
+#ghx-modes-tools #ghx-view-presentation {
+  display: none; }
+
+/* Colour coded progress bars for epics in the side bar */
+/* Fix rows in work view columns to not take more space than necessary */
+.ghx-work .ghx-swimlane .ghx-columns .ghx-issue {
+  height: auto; }
+  .ghx-work .ghx-swimlane .ghx-columns .ghx-issue .ghx-grabber {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: 0; }
+
+.chrome .ghx-swimlane .ghx-issue-fields .ghx-summary .ghx-inner {
+  height: auto; }
+
+/* Reduce unused top spacing of pool */
+#ghx-pool {
+  padding-top: 0 !important; }
+
+/* Hide the distracting header stalker */
+#ghx-work #js-swimlane-header-stalker {
+  display: none; }
+
+#ghx-column-header-group {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  width: auto !important;
+  margin-bottom: 10px; }
+
+/* Better background for work panel columns */
+#ghx-work .ghx-swimlane .ghx-column {
+  background-color: #ECECEC;
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.3) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.3) 75%, transparent 75%, transparent);
+  background-size: 10px 10px; }
