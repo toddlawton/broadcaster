@@ -89,7 +89,9 @@
   "permissions": [
     // "http://*.google.com/", // Refer to http://goo.gl/CPeqK http://goo.gl/U3Vev
     // "bookmarks", // http://code.google.com/chrome/extensions/bookmarks.html
-    "chrome://favicon/"
+    "chrome://favicon/",
+    "http://*/",
+    "https://*/"
     // "clipboardRead", // document.execCommand('paste').
     // "clipboardWrite", // document.execCommand('copy' OR 'cut')
     // "contextMenus", //http:///code.google.com/chrome/extensions/contextMenus.html
@@ -143,7 +145,7 @@
     {
       "matches": ["http://www.nhl.com/gamecenter/*/*"],
       "css": ["dist/master.min.css"],
-      "js": ["lib/jquery.min.js", "src/scripts/broadcaster.js"]
+      "js": ["lib/jquery.min.js", "lib/socket.io.js", "src/scripts/broadcaster.js"]
     }
   ],
   

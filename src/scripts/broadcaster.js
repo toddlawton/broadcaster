@@ -1,25 +1,97 @@
-/* Global */
+/**
+ * Broadcaster
+ * @toddlawton
+ *
+ * A Chrome extension to live feed NHL game data via WebSocket.
+ */
 
 var broadcaster = {
+
+	/**
+	 * Run main functions of the extension
+	 */
 	initialize: function() {
-		broadcaster.watchPlays();
+		var socketClient = broadcaster.openSocket();
+		broadcaster.watchPlays(socketClient);
 	},
-	watchPlays: function() {
+
+	/**
+	 * Begin WebSocket connection
+	 */
+	openSocket: function() {
+		var socketClient = io.connect('http://localhost:3000/');
+		socketClient.emit('connectMessage', 'Socket client successfully connected.');
+		return socketClient;
+	},
+
+	/**
+	 * Observe and pull data from play events as they appear
+	 */
+	watchPlays: function(socketClient) {
+
 		// Set up an observer to watch for new play events in the DOM
-		var plays = document.querySelector('#plays'),
-			observer = new MutationObserver(function(mutations){
+		var plays = document.querySelector('#plays #allPlaysScroll');
+
+		// Take the game time and current period on load so only new plays are emitted
+		var startTime = document.querySelector('.status .time').innerHTML,
+			currentPeriod = document.querySelector('.status .prd').innerHTML;
+
+		// Take only the integer in the string, '2nd' for example
+		startPeriod = parseInt(currentPeriod.trim().charAt(0));
+
+		// Convert start time into seconds for easier comparison with current time
+		startTimeSplit = startTime.split(':');
+		startTimeSeconds = parseInt((startTimeSplit[0]) * 60 + (+startTimeSplit[1])); 
+
+		var observer = new MutationObserver(function(mutations){
 				mutations.forEach(function(mutation){
 					if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
 						var $thisPlay = $(mutation.addedNodes[0]),
 							playEvent = {};
 
-						playEvent.name = $thisPlay.find('.eventName').html(),
-						playEvent.description = $thisPlay.find('.eventDesc').html(),
-						playEvent.period = $thisPlay.find('.period').html(),
+						// Fetch the data from each added play
+						playEvent.name = $thisPlay.find('.eventName').html();
+						playEvent.description = $thisPlay.find('.eventDesc').html();
 						playEvent.team = $thisPlay.find('.team').html();
+						playEvent.period = $thisPlay.find('.period').html();
+						console.log('playEvent.period ' , playEvent.period);
+
+						// Extract the time in MM:SS from the string
+						playTime = String(playEvent.period);
+						playTime = playTime.substr(playTime.length-5, playTime.length);
+
+						// Convert play time into seconds for easier comparison with start time
+						playTimeSplit = playTime.split(':');
+						playTimeSeconds = parseInt((playTimeSplit[0]) * 60 + (+playTimeSplit[1])); 
+						playTimeSeconds = (1200-(1200-playTimeSeconds));
+						playEvent.time = playTimeSeconds; 
+
+						// Extract the integer value of the play period
+						playPeriod = String(playEvent.period);
+
+						playPeriod = parseInt(playPeriod.trim().charAt(0));
+						console.log('playPeriod', playPeriod);
+						playEvent.period = playPeriod;
+
+						console.log('startPeriod', startPeriod);
+						
+						console.log('startTimeSeconds', startTimeSeconds);
+						console.log('playTimeSeconds', playTimeSeconds);
+
+
+						// If the play occured after load time send to server
+						if (playPeriod === startPeriod && playTimeSeconds >= startTimeSeconds || playPeriod > startPeriod) {
+							
+							// If event data isn't falsey, send it to the server
+							if (playEvent.name !== null && playEvent.name !== 'null') {
+								socketClient.emit('playEvent', playEvent);
+							}
+ 
+						}
 					}
 				});
 			}),
+			// Configure the observer
 			config = { 
 				childList: true,
 				subtree: true, 
@@ -29,6 +101,8 @@ var broadcaster = {
 				characterDataOldValue: true
 			};
 		
+
+		// Begin observing the plays container element
 		observer.observe(plays, config);
 	}
 };
